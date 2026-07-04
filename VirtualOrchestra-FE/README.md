@@ -57,3 +57,13 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## Project folder structure
+
+The application structure under `src/app` follows the Angular Tips recommendation of splitting code into `core`, `features`, and `shared`.
+
+- `core`: global application concerns such as layout, error handling, interceptors, guards, providers, and auth.
+- `features`: business domains grouped by feature, for example `piano`, `dashboard`, or `orchestra`.
+- `shared`: reusable UI elements and cross-feature utilities.
+
+See `src/app/STRUCTURE.md` for the scaffold and usage notes.

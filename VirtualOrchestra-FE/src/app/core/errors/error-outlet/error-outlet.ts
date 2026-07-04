@@ -1,12 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 
 import { ErrorNotificationService } from '../error-notification.service';
 
 @Component({
   selector: 'app-error-outlet',
-  standalone: true,
+  imports: [],
   templateUrl: './error-outlet.html',
   styleUrl: './error-outlet.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorOutletComponent {
   private readonly errorNotificationService = inject(ErrorNotificationService);
