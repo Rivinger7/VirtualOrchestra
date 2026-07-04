@@ -1,0 +1,17 @@
+@if (errors().length > 0) {
+  <section class="error-stack" aria-live="assertive" aria-label="Application errors">
+    @for (error of errors(); track error.id) {
+      <article class="error-card">
+        <div class="error-copy">
+          <p class="error-kicker">{{ error.title }}</p>
+          <h2>{{ error.message }}</h2>
+          @if (error.details) {
+            <p class="error-details">{{ error.details }}</p>
+          }
+        </div>
+
+        <button type="button" class="dismiss-button" (click)="dismiss(error.id)">Dismiss</button>
+      </article>
+    }
+  </section>
+}

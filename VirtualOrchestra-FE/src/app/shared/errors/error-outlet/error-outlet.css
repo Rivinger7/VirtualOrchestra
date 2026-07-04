@@ -1,0 +1,72 @@
+:host {
+  display: block;
+}
+
+.error-stack {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 76rem;
+  margin: 0 auto 1rem;
+}
+
+.error-card {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(255, 186, 109, 0.26);
+  border-radius: 1.15rem;
+  background: linear-gradient(180deg, rgba(72, 35, 18, 0.92), rgba(43, 22, 13, 0.96));
+  box-shadow: 0 18px 40px rgba(9, 4, 2, 0.2);
+}
+
+.error-copy {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.error-kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #ffc878;
+}
+
+.error-card h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #fff4e2;
+}
+
+.error-details {
+  margin: 0;
+  color: rgba(255, 236, 212, 0.74);
+}
+
+.dismiss-button {
+  padding: 0.65rem 0.95rem;
+  border: 1px solid rgba(255, 213, 153, 0.24);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff4e2;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.dismiss-button:hover {
+  transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 213, 153, 0.4);
+}
+
+@media (max-width: 720px) {
+  .error-card {
+    flex-direction: column;
+  }
+}
