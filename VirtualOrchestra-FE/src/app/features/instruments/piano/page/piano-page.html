@@ -1,0 +1,331 @@
+<section class="relative flex flex-col gap-4 overflow-hidden p-4 text-slate-100">
+  <div
+    class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.18),transparent_35%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.12),transparent_28%),linear-gradient(180deg,rgba(15,23,42,0.92),rgba(2,6,23,1))]"
+  ></div>
+
+  <!-- CONTROL PANEL -->
+  <app-instrument-control-panel
+    [typeOptions]="typeOptions"
+    [selectedType]="selectedType()"
+    (selectedTypeChange)="setSelectedType($event)"
+    [volume]="volume()"
+    (volumeChange)="setVolume($event)"
+    (toggleMuteRequested)="toggleMute()"
+    [sustainEnabled]="sustainEnabled()"
+    (sustainEnabledChange)="setSustainEnabled($event)"
+    [metronomeEnabled]="metronomeEnabled()"
+    (metronomeEnabledChange)="setMetronomeEnabled($event)"
+    [metronomeBpm]="metronomeBpm()"
+    (metronomeBpmChange)="setMetronomeBpm($event)"
+    [recordTime]="recordTime()"
+    [recordingState]="recordingState()"
+    (togglePlaybackRequested)="toggleRecording()"
+    (stopRecordingRequested)="stopRecording()"
+  />
+
+  <!-- MAIN KEYBOARD -->
+  <div
+    class="rounded-[1.75rem] border border-slate-800/80 bg-slate-950/70 p-4 shadow-2xl shadow-sky-950/30 backdrop-blur"
+  >
+    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.35em] text-sky-300/80">Range</p>
+        <h2 class="mt-2 text-2xl font-semibold text-white">Interactive Piano Keys</h2>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
+          {{ rangeDescription() }}
+        </p>
+      </div>
+
+      <div
+        class="rounded-2xl border border-slate-800/90 bg-slate-900/70 px-4 py-3 text-sm text-slate-300"
+      >
+        <p class="font-medium text-white">Shortcuts</p>
+        <p class="mt-1 font-mono tracking-[0.2em] text-sky-300">{{ shortcutLegend() }}</p>
+        <div class="mt-3 flex items-center gap-2 text-xs">
+          <span
+            class="rounded-full border px-2 py-1 font-medium"
+            [class.border-emerald-400/40]="sustainEnabled()"
+            [class.bg-emerald-500/10]="sustainEnabled()"
+            [class.text-emerald-300]="sustainEnabled()"
+            [class.border-slate-700]="!sustainEnabled()"
+            [class.bg-slate-800/70]="!sustainEnabled()"
+            [class.text-slate-400]="!sustainEnabled()"
+          >
+            Sustain {{ sustainEnabled() ? 'On' : 'Off' }}
+          </span>
+          <span class="text-slate-400">Hold Space to pedal</span>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="rounded-3xl border border-white/10 bg-linear-to-b from-slate-900 via-black to-slate-950 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+    >
+      <div
+        class="relative mx-auto h-72 w-full overflow-hidden rounded-[1.2rem] border border-white/6 bg-[linear-gradient(180deg,rgba(15,23,42,0.6),rgba(2,6,23,0.95))] p-3 sm:h-84"
+      >
+        <div
+          class="absolute inset-x-0 top-0 h-16 bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.18),transparent_55%)]"
+        ></div>
+
+        <div
+          class="relative flex h-full touch-none select-none rounded-2xl bg-slate-950/50 pt-5"
+          [class.gap-1]="!isDenseLayout()"
+          [class.gap-px]="isDenseLayout()"
+          [class.p-2]="!isDenseLayout()"
+          [class.p-1]="isDenseLayout()"
+        >
+          @for (key of whiteKeys(); track key.id) {
+            <button
+              type="button"
+              class="relative flex h-full flex-1 flex-col justify-end overflow-hidden border border-slate-300/15 text-left text-slate-900 transition duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              [class.rounded-b-[1.1rem]]="!isDenseLayout()"
+              [class.rounded-t-[0.85rem]]="!isDenseLayout()"
+              [class.rounded-b-[0.85rem]]="isDenseLayout()"
+              [class.rounded-t-[0.65rem]]="isDenseLayout()"
+              [class.px-2]="!isDenseLayout()"
+              [class.px-1]="isDenseLayout()"
+              [class.pb-4]="!isDenseLayout()"
+              [class.pb-3]="isDenseLayout()"
+              [class.pt-5]="!isDenseLayout()"
+              [class.pt-4]="isDenseLayout()"
+              [attr.aria-label]="'Play note ' + key.note"
+              [attr.aria-pressed]="isActiveKey(key.id)"
+              [style.background]="
+                isActiveKey(key.id)
+                  ? 'linear-gradient(180deg, #f8fbff 0%, #dbeafe 60%, #93c5fd 100%)'
+                  : 'linear-gradient(180deg, #ffffff 0%, #f8fafc 60%, #e2e8f0 100%)'
+              "
+              [style.boxShadow]="
+                isActiveKey(key.id)
+                  ? 'inset 0 -14px 0 rgba(14, 165, 233, 0.22), 0 0 22px rgba(56, 189, 248, 0.18)'
+                  : 'inset 0 -12px 0 rgba(148, 163, 184, 0.28)'
+              "
+              [style.transform]="isActiveKey(key.id) ? 'translateY(4px)' : 'translateY(0px)'"
+              (pointerdown)="handlePointerDown($event, key)"
+              (pointerenter)="handlePointerEnter($event, key)"
+              (pointerup)="handlePointerUp($event, key.id)"
+            >
+              <span
+                class="flex flex-col items-center font-semibold"
+                [class.gap-2]="!isDenseLayout()"
+                [class.gap-1]="isDenseLayout()"
+                [class.text-sm]="!isUltraDenseLayout()"
+                [class.text-[0.65rem]]="isUltraDenseLayout()"
+                [class.sm:text-base]="!isDenseLayout()"
+              >
+                <span
+                  class="font-medium uppercase text-slate-500"
+                  [class.text-xs]="!isUltraDenseLayout()"
+                  [class.text-[0.55rem]]="isUltraDenseLayout()"
+                  [class.tracking-[0.25em]]="!isDenseLayout()"
+                  [class.tracking-[0.12em]]="isDenseLayout()"
+                >
+                  {{ key.shortcut ?? '' }}
+                </span>
+                <span>{{ key.note }}</span>
+              </span>
+            </button>
+          }
+
+          @for (key of blackKeys(); track key.id) {
+            <button
+              type="button"
+              class="absolute top-2 z-10 flex h-[58%] -translate-x-1/2 flex-col justify-end border border-white/8 text-left text-white transition duration-150 ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
+              [class.rounded-b-[1rem]]="!isDenseLayout()"
+              [class.rounded-t-[0.65rem]]="!isDenseLayout()"
+              [class.rounded-b-[0.75rem]]="isDenseLayout()"
+              [class.rounded-t-[0.5rem]]="isDenseLayout()"
+              [class.px-2]="!isDenseLayout()"
+              [class.px-1]="isDenseLayout()"
+              [class.pb-3]="!isDenseLayout()"
+              [class.pb-2]="isDenseLayout()"
+              [class.pt-3]="!isDenseLayout()"
+              [class.pt-2]="isDenseLayout()"
+              [attr.aria-label]="'Play note ' + key.note"
+              [attr.aria-pressed]="isActiveKey(key.id)"
+              [style.left.%]="key.positionPercent"
+              [style.width.%]="blackKeyWidthPercent()"
+              [style.background]="
+                isActiveKey(key.id)
+                  ? 'linear-gradient(180deg, #0f172a 0%, #082f49 50%, #38bdf8 100%)'
+                  : 'linear-gradient(180deg, #111827 0%, #020617 55%, #0f172a 100%)'
+              "
+              [style.boxShadow]="
+                isActiveKey(key.id)
+                  ? '0 18px 40px rgba(14, 165, 233, 0.28), inset 0 -10px 0 rgba(125, 211, 252, 0.22)'
+                  : '0 14px 24px rgba(2, 6, 23, 0.45), inset 0 -8px 0 rgba(15, 23, 42, 0.85)'
+              "
+              [style.transform]="
+                isActiveKey(key.id)
+                  ? 'translateX(-50%) translateY(6px)'
+                  : 'translateX(-50%) translateY(0px)'
+              "
+              (pointerdown)="handlePointerDown($event, key)"
+              (pointerenter)="handlePointerEnter($event, key)"
+              (pointerup)="handlePointerUp($event, key.id)"
+            >
+              <span
+                class="flex flex-col items-center font-semibold"
+                [class.gap-2]="!isDenseLayout()"
+                [class.gap-1]="isDenseLayout()"
+                [class.text-sm]="!isUltraDenseLayout()"
+                [class.text-[0.65rem]]="isUltraDenseLayout()"
+                [class.sm:text-base]="!isDenseLayout()"
+              >
+                <span
+                  class="font-medium uppercase text-slate-400"
+                  [class.text-xs]="!isUltraDenseLayout()"
+                  [class.text-[0.55rem]]="isUltraDenseLayout()"
+                  [class.tracking-[0.25em]]="!isDenseLayout()"
+                  [class.tracking-[0.12em]]="isDenseLayout()"
+                >
+                  {{ key.shortcut ?? '' }}
+                </span>
+                <span>{{ key.note }}</span>
+              </span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO SECTION -->
+  <div class="grid grid-cols-1 gap-4 xl:grid-cols-12 xl:items-stretch">
+    <!-- LEFT -->
+    <div
+      class="flex h-full flex-col rounded-2xl border border-slate-800 bg-slate-900/70 p-5 xl:col-span-3"
+    >
+      <p class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-300/80">
+        Keyboard Shortcuts
+      </p>
+      <div class="mt-4 flex flex-1 flex-col space-y-3 text-sm text-slate-300">
+        <p>Mỗi phím piano đang map sang một phím vật lý để bạn nối tiếp input logic sau này.</p>
+        <div class="grid grid-cols-2 gap-2 font-mono text-xs sm:grid-cols-3 xl:grid-cols-2">
+          @for (key of pagedShortcutKeys(); track key.id) {
+            <div class="rounded-xl border border-slate-800 bg-slate-950/70 px-3 py-2">
+              <span class="text-sky-300">{{ key.shortcut }}</span>
+              <span class="mx-2 text-slate-500">-></span>
+              <span>{{ key.note }}</span>
+            </div>
+          }
+        </div>
+        <div class="mt-auto flex items-center justify-between pt-2 text-xs text-slate-400">
+          <span>{{ shortcutRangeLabel() }}</span>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="rounded-lg border border-slate-700 px-3 py-1 transition hover:border-sky-400/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              [disabled]="shortcutPage() === 0"
+              (click)="previousShortcutPage()"
+            >
+              Prev
+            </button>
+            <button
+              type="button"
+              class="rounded-lg border border-slate-700 px-3 py-1 transition hover:border-sky-400/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              [disabled]="shortcutPage() >= shortcutPageCount() - 1"
+              (click)="nextShortcutPage()"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="flex h-full flex-col gap-4 xl:col-span-9">
+      <div
+        class="min-h-42 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 xl:flex-[0_0_auto]"
+      >
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-300/80">
+              Range Preview
+            </p>
+            <h3 class="mt-2 text-xl font-semibold text-white">{{ rangeTitle() }} layout</h3>
+            <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-300">
+              Layout hiện tại đang render {{ keys().length }} keys. Bạn có thể đổi preset trong
+              dropdown để thử nhiều octave hơn mà không phải sửa template.
+            </p>
+          </div>
+
+          <div
+            class="rounded-2xl border border-slate-800 bg-slate-950/70 px-4 py-3 text-sm text-slate-300"
+          >
+            <p class="font-medium text-white">Active notes</p>
+            <p class="mt-1 text-lg font-semibold text-sky-300">
+              {{
+                activeNotes().length > 0
+                  ? activeNotes()
+                      .map((key) => key.note)
+                      .join(' - ')
+                  : focusedKey().note
+              }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-3">
+        <div class="h-full min-h-50 rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-300/80">Note Info</p>
+          <div class="mt-4 space-y-3 text-sm text-slate-300">
+            <div class="flex items-center justify-between">
+              <span>Selected note</span>
+              <span class="font-semibold text-white">{{ focusedKey().note }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Frequency</span>
+              <span class="font-semibold text-white">{{ focusedKey().frequency }} Hz</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span>Key type</span>
+              <span class="font-semibold text-white">{{ focusedKey().type }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="h-full min-h-50 rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-300/80">
+            Audio Engine
+          </p>
+          <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+            <p>Đã gắn sẵn Web Audio API với oscillator dạng triangle để bạn có âm demo ngay.</p>
+            <p>
+              Envelope hiện tại dùng attack ngắn và release nhẹ, đủ để test UX trước khi thay bằng
+              samples thật.
+            </p>
+          </div>
+        </div>
+
+        <div class="h-full min-h-50 rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+          <p class="text-xs font-semibold uppercase tracking-[0.3em] text-sky-300/80">
+            Implementation Notes
+          </p>
+          <div class="mt-4 space-y-3 text-sm leading-6 text-slate-300">
+            <p>
+              Dữ liệu note đang nằm gọn trong component nên bạn có thể đổi sang service, MIDI map
+              hoặc sample player sau.
+            </p>
+            <p>
+              Phần click, keydown và keyup đã tách riêng để tiện nối sustain, velocity, multi-note
+              hoặc recording logic.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <!-- <div class="grid grid-cols-3 gap-4">
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">About</div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">Tips</div>
+
+    <div class="rounded-2xl border border-slate-800 bg-slate-900/70 p-5">Tech Stack</div>
+  </div> -->
+</section>

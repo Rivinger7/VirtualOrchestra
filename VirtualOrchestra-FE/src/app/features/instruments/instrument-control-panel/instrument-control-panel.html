@@ -1,0 +1,125 @@
+<div class="grid grid-cols-12 gap-4 font-semibold">
+  <div class="col-span-2 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 space-y-4">
+    <p>Types</p>
+    <p-select
+      class="w-full"
+      [options]="typeOptions()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="selectedType()"
+      (ngModelChange)="onSelectedTypeChange($event)"
+      placeholder="Select Type"
+    />
+  </div>
+
+  <div class="col-span-3 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 space-y-6">
+    <p>Volume</p>
+    <div class="flex items-center gap-x-4 transition-all duration-300">
+      <lucide-icon [img]="volumeIcon()" (click)="toggleMute()" />
+      <p-slider
+        class="flex-1"
+        [ngModel]="volume()"
+        (ngModelChange)="onVolumeChange($event)"
+        [min]="0"
+        [max]="100"
+      />
+      <span class="w-8 text-right text-slate-300"> {{ volume() }} </span>
+    </div>
+  </div>
+
+  <div class="col-span-1 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 space-y-4">
+    <p>Sustain</p>
+    <div class="flex items-center gap-x-4">
+      <lucide-icon [img]="sustainIcon" (click)="toggleSustain()" />
+      <p-toggleSwitch
+        class="bg-slate-800/70! w-full"
+        [ngModel]="sustainEnabled()"
+        (ngModelChange)="sustainEnabledChange.emit($event)"
+        onLabel="On"
+        offLabel="Off"
+      ></p-toggleSwitch>
+    </div>
+    <p class="text-xs font-normal text-slate-400">Toggle here or hold Space like a pedal.</p>
+  </div>
+
+  <div class="col-span-2 rounded-2xl border border-slate-800 bg-slate-900/70 p-5 space-y-6">
+    <p>Metronome</p>
+    <div class="flex items-center gap-x-4">
+      <lucide-icon [img]="metronomeIcon" (click)="toggleMetronome()" />
+      <p-toggleSwitch
+        class="bg-slate-800/70! w-full"
+        [ngModel]="metronomeEnabled()"
+        (ngModelChange)="metronomeEnabledChange.emit($event)"
+        onLabel="On"
+        offLabel="Off"
+      ></p-toggleSwitch>
+    </div>
+    <div class="space-y-3">
+      <div class="flex items-center justify-between text-sm text-slate-300">
+        <span>BPM</span>
+        <span class="font-mono text-white">{{ metronomeBpm() }}</span>
+      </div>
+      <p-slider
+        [ngModel]="metronomeBpm()"
+        (ngModelChange)="onBpmChange($event)"
+        [min]="40"
+        [max]="240"
+      />
+    </div>
+  </div>
+
+  <div class="col-span-4 rounded-2xl border border-slate-800 bg-slate-900/70 p-5">
+    <div class="flex items-center justify-between">
+      <!-- Status -->
+      <div class="flex flex-col gap-2">
+        <div class="flex items-center gap-3">
+          <span class="h-3 w-3 rounded-full bg-red-500"></span>
+          <span class="font-mono text-lg"> {{ formattedRecordTime() }} </span>
+        </div>
+        @if (this.recordingState() === 'recording') {
+          <p class="text-sm text-green-400">Recording...</p>
+        } @else if (this.recordingState() === 'paused') {
+          <p class="text-sm text-yellow-400">Paused</p>
+        } @else {
+          <p class="text-sm text-slate-400">Not recording</p>
+        }
+      </div>
+      <!-- Actions -->
+      <div class="flex gap-6">
+        <!-- Play -->
+        <button class="flex flex-col items-center gap-2" (click)="togglePlayback()">
+          <div
+            class="flex h-14 w-14 items-center justify-center rounded-full border border-green-700 bg-green-600/20 hover:bg-green-600/30"
+          >
+            <lucide-icon
+              class="h-6 w-6"
+              [class.text-green-400]="
+                recordingState() === 'paused' || recordingState() === 'stopped'
+              "
+              [class.text-yellow-400]="recordingState() === 'recording'"
+              [img]="playbackIcon()"
+            ></lucide-icon>
+          </div>
+          @if (this.recordingState() === 'recording') {
+            <span class="text-sm text-yellow-400">Pause</span>
+          } @else {
+            <span class="text-sm text-green-400">Play</span>
+          }
+        </button>
+        <!-- Stop -->
+        <button
+          class="flex flex-col items-center gap-2"
+          (click)="stopRecording()"
+          [ngClass]="isStopRecordingClass()"
+        >
+          <div
+            class="flex h-14 w-14 items-center justify-center rounded-full border border-slate-600 bg-slate-700/40 hover:bg-slate-700"
+          >
+            <lucide-icon [img]="stopRecorderIcon" class="h-6 w-6" />
+          </div>
+          <span class="text-sm">Stop</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
